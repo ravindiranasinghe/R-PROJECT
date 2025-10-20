@@ -1,0 +1,106 @@
+------------------------------------------------------------------------
+
+title: "R Notebook" output: html_notebook
+
+```{r}
+read_csv("who_ambient_air_quality_database_version_2024_(v6.1) (1).csv")
+```
+
+```{r}
+(df)
+```
+
+```{r}
+library(dplyr)
+```
+
+```{r}
+  selected_columns<-whoAQ %>%
+  select(country_name, city, year, pm25_concentration, pm10_concentration
+,no2_concentration , latitude, longitude)
+  selected_columns
+```
+
+```{r}
+
+ df <- whoAQ %>%
+  mutate(
+    country_name = as.character(country_name),
+    year    = as.integer(year),
+    pm25_concentration    = as.numeric(pm25_concentration),
+    pm10_concentration    = as.numeric(pm10_concentration),
+    no2_concentration     = as.numeric(no2_concentration)
+  )
+ 
+
+```
+
+```{r}
+df <- whoAQ %>%
+  distinct() %>%            
+  filter(pm25_concentration >= 0, pm10_concentration >= 0)   
+
+```
+
+```{r}
+whoAQ$country_name <- gsub("T√ºrkiye", "Turkiye", whoAQ$country_name)
+
+```
+
+```{r}
+install.packages("countrycode")
+```
+
+```{r}
+library(countrycode)
+```
+
+```{r}
+
+
+df <- whoAQ %>%
+  mutate(continent = countrycode(country, "country.name", "continent"))
+
+```
+
+```{r}
+any(is.na(whoAQ))
+
+```
+
+```{r}
+sum(is.na(whoAQ))
+
+```
+
+```{r}
+colSums(is.na(whoAQ))
+
+```
+
+```{r}
+prop_missing <- colSums(is.na(whoAQ))/nrow(whoAQ)
+
+data_clean <- whoAQ[, prop_missing <= 0.5]
+
+
+```
+
+```{r}
+countries <- c("Sri Lanka","Germany","South Africa",
+               "United States of America","Brazil","Australia")
+
+df_sel <- whoAQ %>%
+  filter(country_name %in% countries) %>%
+  drop_na(pm25_concentration,pm10_concentration)  
+```
+
+```{r}
+cleaned_data <- df_sel
+
+```
+
+```{r}
+View(cleaned_data)
+
+```
